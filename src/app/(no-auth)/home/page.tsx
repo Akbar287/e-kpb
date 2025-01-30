@@ -5,9 +5,9 @@ import imageHero from "@/assets/images/backgroundlayanan.webp"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import Link from "next/link"
-import { Metadata } from "next"
-import { Canvas, useFrame } from "@react-three/fiber"
-import { OrbitControls, Environment } from "@react-three/drei"
+// import { Metadata } from "next"
+// import { Canvas, useFrame } from "@react-three/fiber"
+// import { OrbitControls, Environment } from "@react-three/drei"
 
 const dataTestimoni = [
     {
@@ -266,120 +266,120 @@ const HomePage = () => {
     )
 }
 
-function FarmerScene() {
-    return (
-        <div style={{ height: "100vh", width: "100vw" }}>
-            <Canvas shadows camera={{ position: [5, 2, 5], fov: 60 }}>
-                <ambientLight intensity={0.5} />
-                <directionalLight
-                    position={[10, 10, 5]}
-                    intensity={1}
-                    castShadow
-                    shadow-mapSize-width={2048}
-                    shadow-mapSize-height={2048}
-                />
+// function FarmerScene() {
+//     return (
+//         <div style={{ height: "100vh", width: "100vw" }}>
+//             <Canvas shadows camera={{ position: [5, 2, 5], fov: 60 }}>
+//                 <ambientLight intensity={0.5} />
+//                 <directionalLight
+//                     position={[10, 10, 5]}
+//                     intensity={1}
+//                     castShadow
+//                     shadow-mapSize-width={2048}
+//                     shadow-mapSize-height={2048}
+//                 />
 
-                <RiceField />
-                <FarmerModel />
-                <OrbitControls />
-                <Environment preset="sunset" />
-            </Canvas>
-        </div>
-    )
-}
+//                 <RiceField />
+//                 <FarmerModel />
+//                 <OrbitControls />
+//                 <Environment preset="sunset" />
+//             </Canvas>
+//         </div>
+//     )
+// }
 
-function FarmerModel() {
-    const leftArm = useRef<THREE.Mesh>(null)
-    const rightArm = useRef<THREE.Mesh>(null)
+// function FarmerModel() {
+//     const leftArm = useRef<THREE.Mesh>(null)
+//     const rightArm = useRef<THREE.Mesh>(null)
 
-    // Animation for arms
-    useFrame(({ clock }) => {
-        const time = clock.getElapsedTime()
-        if (leftArm.current && rightArm.current) {
-            leftArm.current.rotation.x = Math.sin(time) * 0.3
-            rightArm.current.rotation.x = Math.sin(time + Math.PI) * 0.3
-        }
-    })
+//     // Animation for arms
+//     useFrame(({ clock }) => {
+//         const time = clock.getElapsedTime()
+//         if (leftArm.current && rightArm.current) {
+//             leftArm.current.rotation.x = Math.sin(time) * 0.3
+//             rightArm.current.rotation.x = Math.sin(time + Math.PI) * 0.3
+//         }
+//     })
 
-    return (
-        <group position={[0, -1, 0]}>
-            {/* Body */}
-            <mesh position={[0, 1.5, 0]}>
-                <cylinderGeometry args={[0.5, 0.5, 2]} />
-                <meshStandardMaterial color="#4d7c0f" />
-            </mesh>
+//     return (
+//         <group position={[0, -1, 0]}>
+//             {/* Body */}
+//             <mesh position={[0, 1.5, 0]}>
+//                 <cylinderGeometry args={[0.5, 0.5, 2]} />
+//                 <meshStandardMaterial color="#4d7c0f" />
+//             </mesh>
 
-            {/* Head */}
-            <mesh position={[0, 2.5, 0]}>
-                <sphereGeometry args={[0.4]} />
-                <meshStandardMaterial color="#ffcc99" />
-            </mesh>
+//             {/* Head */}
+//             <mesh position={[0, 2.5, 0]}>
+//                 <sphereGeometry args={[0.4]} />
+//                 <meshStandardMaterial color="#ffcc99" />
+//             </mesh>
 
-            {/* Hat */}
-            <mesh position={[0, 2.8, 0]} rotation={[-0.3, 0, 0]}>
-                <coneGeometry args={[0.5, 0.3]} />
-                <meshStandardMaterial color="#6b4423" />
-            </mesh>
+//             {/* Hat */}
+//             <mesh position={[0, 2.8, 0]} rotation={[-0.3, 0, 0]}>
+//                 <coneGeometry args={[0.5, 0.3]} />
+//                 <meshStandardMaterial color="#6b4423" />
+//             </mesh>
 
-            {/* Arms */}
-            <mesh ref={leftArm} position={[-0.7, 2, 0]} rotation={[0, 0, -0.5]}>
-                <cylinderGeometry args={[0.1, 0.1, 1]} />
-                <meshStandardMaterial color="#ffcc99" />
-            </mesh>
+//             {/* Arms */}
+//             <mesh ref={leftArm} position={[-0.7, 2, 0]} rotation={[0, 0, -0.5]}>
+//                 <cylinderGeometry args={[0.1, 0.1, 1]} />
+//                 <meshStandardMaterial color="#ffcc99" />
+//             </mesh>
 
-            <mesh ref={rightArm} position={[0.7, 2, 0]} rotation={[0, 0, 0.5]}>
-                <cylinderGeometry args={[0.1, 0.1, 1]} />
-                <meshStandardMaterial color="#ffcc99" />
-            </mesh>
+//             <mesh ref={rightArm} position={[0.7, 2, 0]} rotation={[0, 0, 0.5]}>
+//                 <cylinderGeometry args={[0.1, 0.1, 1]} />
+//                 <meshStandardMaterial color="#ffcc99" />
+//             </mesh>
 
-            {/* Legs */}
-            <mesh position={[-0.3, 0.5, 0]}>
-                <cylinderGeometry args={[0.15, 0.15, 1.5]} />
-                <meshStandardMaterial color="#2d3748" />
-            </mesh>
+//             {/* Legs */}
+//             <mesh position={[-0.3, 0.5, 0]}>
+//                 <cylinderGeometry args={[0.15, 0.15, 1.5]} />
+//                 <meshStandardMaterial color="#2d3748" />
+//             </mesh>
 
-            <mesh position={[0.3, 0.5, 0]}>
-                <cylinderGeometry args={[0.15, 0.15, 1.5]} />
-                <meshStandardMaterial color="#2d3748" />
-            </mesh>
+//             <mesh position={[0.3, 0.5, 0]}>
+//                 <cylinderGeometry args={[0.15, 0.15, 1.5]} />
+//                 <meshStandardMaterial color="#2d3748" />
+//             </mesh>
 
-            {/* Hoe */}
-            <mesh position={[1, 1, 0]} rotation={[0, 0, -0.5]}>
-                <cylinderGeometry args={[0.05, 0.05, 2]} />
-                <meshStandardMaterial color="#666" />
-            </mesh>
-            <mesh position={[1.8, 1.2, 0]}>
-                <boxGeometry args={[0.4, 0.1, 0.1]} />
-                <meshStandardMaterial color="#444" />
-            </mesh>
-        </group>
-    )
-}
+//             {/* Hoe */}
+//             <mesh position={[1, 1, 0]} rotation={[0, 0, -0.5]}>
+//                 <cylinderGeometry args={[0.05, 0.05, 2]} />
+//                 <meshStandardMaterial color="#666" />
+//             </mesh>
+//             <mesh position={[1.8, 1.2, 0]}>
+//                 <boxGeometry args={[0.4, 0.1, 0.1]} />
+//                 <meshStandardMaterial color="#444" />
+//             </mesh>
+//         </group>
+//     )
+// }
 
-function RiceField() {
-    return (
-        <group>
-            {/* Ground */}
-            <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
-                <planeGeometry args={[20, 20]} />
-                <meshStandardMaterial color="#5b7c3d" />
-            </mesh>
+// function RiceField() {
+//     return (
+//         <group>
+//             {/* Ground */}
+//             <mesh rotation={[-Math.PI / 2, 0, 0]} receiveShadow>
+//                 <planeGeometry args={[20, 20]} />
+//                 <meshStandardMaterial color="#5b7c3d" />
+//             </mesh>
 
-            {/* Rice plants */}
-            {Array.from({ length: 50 }).map((_, i) => (
-                <mesh
-                    key={i}
-                    position={[
-                        (Math.random() - 0.5) * 10,
-                        0.2,
-                        (Math.random() - 0.5) * 10,
-                    ]}
-                >
-                    <cylinderGeometry args={[0.02, 0.02, 0.4]} />
-                    <meshStandardMaterial color="#6b8c42" />
-                </mesh>
-            ))}
-        </group>
-    )
-}
+//             {/* Rice plants */}
+//             {Array.from({ length: 50 }).map((_, i) => (
+//                 <mesh
+//                     key={i}
+//                     position={[
+//                         (Math.random() - 0.5) * 10,
+//                         0.2,
+//                         (Math.random() - 0.5) * 10,
+//                     ]}
+//                 >
+//                     <cylinderGeometry args={[0.02, 0.02, 0.4]} />
+//                     <meshStandardMaterial color="#6b8c42" />
+//                 </mesh>
+//             ))}
+//         </group>
+//     )
+// }
 export default HomePage
