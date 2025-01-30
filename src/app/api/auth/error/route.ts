@@ -1,9 +1,9 @@
-import { NextApiRequest, NextApiResponse } from "next"
+import { NextRequest, NextResponse } from 'next/server';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-    const { error } = req.query
-    const redirectUrl = "/login?msg=" + error
-    
-    res.writeHead(302, { Location: redirectUrl })
-    res.end()
+export async function GET(req: NextRequest) {
+    const { searchParams } = new URL(req.url);
+    const error = searchParams.get('error');
+    const redirectUrl = `/login?msg=${error}`;
+
+    return NextResponse.redirect(redirectUrl);
 }
