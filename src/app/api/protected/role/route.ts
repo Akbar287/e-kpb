@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
                 userloginId: session.user.id,
                 username: session.user.username,
             },
-        })
+        }) as any
         
         if (user) {
             user = user.member?.RoleMember.map((rm: any) => {
@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
                     keterangan: rm.role.keterangan,
                     aktif: rm.role.aktif,
                     statusRole: rm.role.statusRole,
-                    layanan: rm.role.layanan.map((layanan) => {
+                    layanan: rm.role.layanan.map((layanan : any) => {
                         return {
                             layananId: layanan.layananId,
                             namaLayanan: layanan.layanan.namaLayanan,
