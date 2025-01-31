@@ -1,10 +1,13 @@
 import { AuthOptions, getServerSession } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import Bycript from "bcrypt";
-import { PrismaClient } from "@prisma/client";
 import { Session } from "next-auth"
 import { JWT } from "next-auth/jwt"
+import { Ktp, Member, Userlogin } from "@/db/schema";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { eq } from "drizzle-orm";
 
+const db = drizzle(process.env.DATABASE_URL!)
 const authOptions: AuthOptions = {
     providers: [
         CredentialsProvider({
@@ -15,37 +18,43 @@ const authOptions: AuthOptions = {
                 password: { label: "password", type: "password" },
             },
             async authorize(credentials, req) {
-                const prisma = new PrismaClient();
                 try {
                     if (!credentials) {
                         throw new Error("No credentials provided");
                     }
-                    const userLogin = await prisma.userlogin.findFirst({
-                        where: { username: credentials.username },
-                        include: { member: { include: { Ktp: { select: { nama: true}}}}}
-                    });
+                    
+                    const userLogin = await db.select({
+                        username: Userlogin.Username,
+                        password: Userlogin.Password,
+                        userloginId: Userlogin.UserloginId,
+                        nama: Ktp.Nama,
+                        email: Member.Email,
+                        avatar: Member.Avatar,
+                    }).from(Userlogin).innerJoin(Member, eq(Userlogin.MemberId, Member.MemberId)).innerJoin(Ktp, eq(Member.KtpId, Ktp.KtpId)).where(eq(Userlogin.Username, credentials.username));
 
-                    if (!userLogin) {
+                    if (userLogin.length === 0) {
                         throw new Error("User tidak ditemukan");
                     }
 
-                    if (!userLogin.password) {
+                    const userLoginData = userLogin[0];
+
+                    if (!userLoginData.password) {
                         throw new Error("Password is null");
                     }
                     const isPasswordValid = await Bycript.compare(
                         credentials.password,
-                        userLogin.password
+                        userLoginData.password
                     );
                     if (!isPasswordValid) {
                         throw new Error("Password salah");
                     }
 
                     const user = {
-                        id: userLogin.userloginId,
-                        username: userLogin.username,
-                        nama: userLogin.member?.Ktp?.nama,
-                        avatar: userLogin.member?.avatar,
-                        email: userLogin.member?.email,
+                        id: userLoginData.userloginId,
+                        username: userLoginData.username,
+                        nama: userLoginData.nama,
+                        avatar: userLoginData.avatar,
+                        email: userLoginData.email,
                     };
 
                     return user;

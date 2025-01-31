@@ -1,27 +1,18 @@
+import { Layanan } from "@/db/schema"
+import { drizzle } from "drizzle-orm/node-postgres"
 import React from "react"
-import { PrismaClient } from "@prisma/client"
 
 interface Layanan {
-    layanan_id: string
-    layananId: string
-    nama_layanan: string
-    namaLayanan: string
-    keterangan: string
-    icon: string
-    url: string
+    LayananId: string
+    NamaLayanan: string
+    Keterangan: string
+    Icon: string
+    Url: string
 }
 
-const prisma = new PrismaClient()
-
 const Page = async () => {
-    const rawData = await prisma.layanan
-        .findMany()
-        .then((data) => {
-            return data
-        })
-        .catch((e) => {
-            console.log(e)
-        })
+    const db = drizzle(process.env.DATABASE_URL!)
+    const rawData = await db.select().from(Layanan)
     const layanans: Layanan[] = JSON.parse(JSON.stringify(rawData))
 
     return (
@@ -44,15 +35,15 @@ const Page = async () => {
                             <div className="inline-block p-3 mb-4 text-gray-800 rounded-lg clay-card bg-gradient-to-br from-primary-light to-primary dark:text-white">
                                 <span
                                     dangerouslySetInnerHTML={{
-                                        __html: service.icon,
+                                        __html: service.Icon,
                                     }}
                                 />
                             </div>
                             <h3 className="mb-2 text-xl font-semibold text-gray-800 dark:text-gray-50">
-                                {service.namaLayanan}
+                                {service.NamaLayanan}
                             </h3>
                             <p className="text-justify text-gray-800 dark:text-gray-50">
-                                {service.keterangan}
+                                {service.Keterangan}
                             </p>
                         </div>
                     ))}

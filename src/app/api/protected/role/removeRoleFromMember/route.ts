@@ -1,6 +1,6 @@
 import { Member, Role, RoleMember, Userlogin } from "@/db/schema"
 import { getSession } from "@/provider/api"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import { drizzle } from "drizzle-orm/node-postgres"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -53,15 +53,11 @@ export async function GET(req: NextRequest) {
             )
         }
 
-        await db.insert(RoleMember).values({
-            MemberId: member[0].MemberId,
-            RoleId: role[0].RoleId,
-            Confirm: false,
-        })
+        await db.delete(RoleMember).where(and(eq(RoleMember.MemberId, member[0].MemberId), eq(RoleMember.RoleId, role[0].RoleId)))
 
         return NextResponse.json(
             {
-                message: "Role berhasil disematkan",
+                message: "Relasi Peran Pengguna berhasil dihapus",
                 data: [],
                 status: "success",
             },

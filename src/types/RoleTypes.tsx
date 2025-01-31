@@ -4,73 +4,73 @@ export enum StatusRole {
 }
 
 export interface RoleTypeProps {
-    roleId: string
-    namaRole: string
-    keterangan: string
-    aktif: boolean
-    confirm: boolean
-    statusRole: StatusRole
-    layanan: LayananTypeProps[]
+    RoleId: string
+    NamaRole: string
+    Keterangan: string
+    Aktif: boolean
+    Confirm: boolean
+    StatusRole: StatusRole
+    Layanan: LayananTypeProps[]
 }
 
 export const RoleTypeValue: RoleTypeProps = {
-    roleId: "",
-    namaRole: "",
-    keterangan: "",
-    aktif: false,
-    confirm: false,
-    statusRole: StatusRole.PUBLIC,
-    layanan: [],
+    RoleId: "",
+    NamaRole: "",
+    Keterangan: "",
+    Aktif: false,
+    Confirm: false,
+    StatusRole: StatusRole.PUBLIC,
+    Layanan: [],
 }
 
 export interface LayananTypeProps {
-    layananId: string
-    namaLayanan: string
-    keterangan: string
-    icon: string
-    url: string
+    LayananId: string
+    NamaLayanan: string
+    Keterangan: string
+    Icon: string
+    Url: string
     SubLayanan: SubLayananTypeProps[]
 }
 
 export const LayananTypeValue: LayananTypeProps = {
-    layananId: "",
-    namaLayanan: "",
-    keterangan: "",
-    icon: "",
-    url: "",
+    LayananId: "",
+    NamaLayanan: "",
+    Keterangan: "",
+    Icon: "",
+    Url: "",
     SubLayanan: [],
 }
 
 export interface SubLayananTypeProps {
-    subLayananId: string
-    namaSubLayanan: string
-    keterangan: string
-    icon: string
-    url: string
-    childLayanan: ChildLayananTypeProps[]
+    SubLayananId: string
+    NamaSubLayanan: string
+    Keterangan: string
+    Icon: string
+    Url: string
+    ChildLayanan: ChildLayananTypeProps[]
 }
 
 export const SubLayananTypeValue: SubLayananTypeProps = {
-    subLayananId: "",
-    namaSubLayanan: "",
-    keterangan: "",
-    icon: "",
-    url: "",
-    childLayanan: [],
+    SubLayananId: "",
+    NamaSubLayanan: "",
+    Keterangan: "",
+    Icon: "",
+    Url: "",
+    ChildLayanan: [],
 }
 
 export interface ChildLayananTypeProps {
-    childLayananId: string
-    namaChildLayanan: string
-    keterangan: string
-    icon: string
-    url: string
+    ChildLayananId: string
+    NamaChildLayanan: string
+    Keterangan: string
+    Icon: string
+    Url: string
 }
 
 export const ChildLayananTypeValue: ChildLayananTypeProps = {
-    childLayananId: "",
-    namaChildLayanan: "",
-    keterangan: "",
-    icon: "",
-    url: "",
+    ChildLayananId: "",
+    NamaChildLayanan: "",
+    Keterangan: "",
+    Icon: "",
+    Url: "",
 }

@@ -1,18 +1,29 @@
+import {
+    Ktp,
+    Member,
+    Notifikasi,
+    NotifikasiGrup,
+    StatusMember,
+    StatusWallet,
+    Userlogin,
+    Wallet,
+} from "@/db/schema"
 import bcrypt from "bcrypt"
-import { PrismaClient } from "@prisma/client"
+import { eq } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/node-postgres"
 import { NextRequest, NextResponse } from "next/server"
 
-const prisma = new PrismaClient()
+const db = drizzle(process.env.DATABASE_URL!)
+
 export async function POST(req: NextRequest) {
     const data = await req.json()
 
-    const userlogin = await prisma.userlogin.findFirst({
-        where: {
-            username: data.username,
-        },
-    })
+    const userlogin = await db
+        .select()
+        .from(Userlogin)
+        .where(eq(Userlogin.Username, data.username))
 
-    if (userlogin) {
+    if (userlogin.length > 0) {
         return NextResponse.json(
             {
                 message: "Username sudah terdaftar",
@@ -30,85 +41,74 @@ export async function POST(req: NextRequest) {
     try {
         const hashedPassword = await bcrypt.hash(data.password, 10)
 
-        const statusMember = await prisma.statusMember.findFirst({
-            where: { namaStatus: "ACTIVE" },
-        })
-        const statusWallet = await prisma.statusWallet.findFirst({
-            where: { namaStatusWallet: "ACTIVE" },
-        })
-        const notifikasiGrup = await prisma.notifikasiGrup.findFirst({
-            where: { namaNotifikasiGrup: "UMUM" },
+        const statusMember = await db
+            .select({ StatusMemberId: StatusMember.StatusMemberId })
+            .from(StatusMember)
+            .where(eq(StatusMember.NamaStatus, "ACTIVE"))
+        const statusWallet = await db
+            .select({ StatusWalletId: StatusWallet.StatusWalletId })
+            .from(StatusWallet)
+            .where(eq(StatusWallet.NamaStatusWallet, "ACTIVE"))
+        const notifikasiGrup = await db
+            .select({ NotifikasiGrupId: NotifikasiGrup.NotifikasiGrupId })
+            .from(NotifikasiGrup)
+            .where(eq(NotifikasiGrup.NamaNotifikasiGrup, "UMUM"))
+
+        const ktp = await db
+            .insert(Ktp)
+            .values({
+                Nik: data.nik,
+                Nama: data.nama,
+                Alamat: data.alamat,
+                JenisKelamin: data.jenisKelamin,
+                TempatLahir: data.tempatLahir,
+                TanggalLahir: new Date(data.tanggalLahir),
+                Verified: data.verified,
+                Pekerjaan: data.pekerjaan,
+            })
+            .returning()
+
+        const member = await db
+            .insert(Member)
+            .values({
+                StatusMemberId: statusMember[0].StatusMemberId,
+                KtpId: ktp[0].KtpId,
+                Email: data.email,
+                NomorHp: data.nomorHp,
+                NomorWa: data.nomorWa,
+                Avatar: "default.png",
+            })
+            .returning()
+
+        await db.insert(Userlogin).values({
+            MemberId: member[0].MemberId,
+            Username: data.username,
+            Password: hashedPassword,
+            Provider: "CREDENTIALS",
+            ProviderAccountId: null,
+            AccessToken: null,
+            RefreshToken: null,
+            LastLogin: new Date(),
         })
 
-        console.log(statusMember, statusWallet, notifikasiGrup)
-
-        const ktp = await prisma.ktp.create({
-            data: {
-                nik: data.nik,
-                nama: data.nama,
-                alamat: data.alamat,
-                jenisKelamin: data.jenisKelamin,
-                tempatLahir: data.tempatLahir,
-                tanggalLahir: new Date(data.tanggalLahir),
-                verified: data.verified,
-                pekerjaan: data.pekerjaan,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        })
-
-        const member = await prisma.member.create({
-            data: {
-                statusMemberId: statusMember?.statusMemberId,
-                ktpId: ktp.ktpId,
-                email: data.email,
-                nomorHp: data.nomorHp,
-                nomorWa: data.nomorWa,
-                avatar: "default.png",
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
-        })
-
-        const userlogin = await prisma.userlogin.create({
-            data: {
-                memberId: member.memberId,
-                username: data.username,
-                password: hashedPassword,
-                provider: "CREDENTIALS",
-                providerAccountId: null,
-                accessToken: null,
-                refreshToken: null,
-                lastLogin: new Date(),
-            },
-        })
-
-        const wallet = await prisma.wallet.create({
-            data: {
-                memberId: member.memberId,
-                statusWalletId: statusWallet?.statusWalletId,
-                saldo: 0,
-                createdAt: new Date(),
-                updatedAt: new Date(),
-            },
+        await db.insert(Wallet).values({
+            MemberId: member[0].MemberId,
+            StatusWalletId: statusWallet[0].StatusWalletId,
+            Saldo: "0",
         })
 
         if (notifikasiGrup !== null) {
-            const notifikasi = await prisma.notifikasi.create({
-                data: {
-                    notifikasiGrupId: notifikasiGrup.notifikasiGrupId,
-                    memberId: member.memberId,
-                    judul: "Selamat Datang",
-                    pesan: "Selamat datang di aplikasi e-KPB",
-                    jenisLayanan: "e-KPB",
-                    statusNotifikasi: "BELUM_DIBACA",
-                    prioritas: "RENDAH",
-                    waktuKirim: new Date(),
-                    createdAt: new Date(),
-                    updatedAt: new Date(),
-                    dataTambahan: JSON.stringify({}),
-                    linkAksi: null,
-                },
+            await db.insert(Notifikasi).values({
+                NotifikasiGrupId: notifikasiGrup[0].NotifikasiGrupId,
+                MemberId: member[0].MemberId,
+                Judul: "Selamat Datang",
+                Pesan: "Selamat datang di aplikasi e-KPB",
+                JenisLayanan: "e-KPB",
+                StatusNotifikasi: "BELUM_DIBACA",
+                Prioritas: "RENDAH",
+                WaktuKirim: new Date(),
+                DataTambahan: JSON.stringify({}),
+                LinkAksi: null,
             })
         }
 

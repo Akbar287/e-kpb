@@ -41,7 +41,7 @@ export function RoleManagerDrawer({
                         ? data.data.filter(
                               (role: RoleTypeProps) =>
                                   !myRoles.some(
-                                      (myRole) => myRole.roleId === role.roleId
+                                      (myRole) => myRole.RoleId === role.RoleId
                                   )
                           )
                         : data.data
@@ -62,7 +62,7 @@ export function RoleManagerDrawer({
     }
 
     const filteredRoles = roles.filter((role) =>
-        role.namaRole.toLowerCase().includes(searchQuery.toLowerCase())
+        role.NamaRole.toLowerCase().includes(searchQuery.toLowerCase())
     )
 
     return (
@@ -130,7 +130,7 @@ export function RoleManagerDrawer({
                                         <AnimatePresence mode="popLayout">
                                             {filteredRoles.map((role) => (
                                                 <motion.div
-                                                    key={role.roleId}
+                                                    key={role.RoleId}
                                                     layout
                                                     initial="hidden"
                                                     animate="visible"
@@ -159,7 +159,7 @@ export function RoleManagerDrawer({
                                                         }
                                                     >
                                                         <h3 className="text-lg font-semibold truncate">
-                                                            {role.namaRole}
+                                                            {role.NamaRole}
                                                         </h3>
 
                                                         <AnimatePresence>

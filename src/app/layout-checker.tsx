@@ -15,8 +15,11 @@ import { selectedLayananStore } from "@/store/SelectedServiceStore"
 import { LoadingScreen } from "@/components/loading-screen"
 import { RoleManagerDrawer } from "@/components/role-manage-drawer"
 import { LayananTypeProps, RoleTypeProps } from "@/types/RoleTypes"
+import { removeItemAtIndex } from "@/lib/utils"
+import { useToast } from "@/hooks/use-toast"
 
 const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
+    const { toast } = useToast()
     const router = useRouter()
     const { data: session, status } = useSession()
     const [app, setApp] = React.useState(false)
@@ -89,17 +92,52 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
 
     const handleAddRole = async (localRole: RoleTypeProps) => {
         const res = await fetch(
-            "/api/protected/role/addRoleToMember?roleId=" + localRole.roleId
+            "/api/protected/role/addRoleToMember?roleId=" + localRole.RoleId
         )
         if (res.status === 200) {
             if (role) {
                 setZustandValue(roleStore, [...role, localRole])
                 setRole([...role, localRole])
-            } else {
-                setZustandValue(roleStore, [localRole])
-                setRole([localRole])
+                localStorage.setItem(
+                    "kpb.my-role",
+                    JSON.stringify([...role, localRole])
+                )
+                setRoles(roles.filter((r) => r.RoleId !== localRole.RoleId))
+
+                toast({
+                    variant: "default",
+                    title: "Peran berhasil ditambahkan",
+                    description: `Peran ${localRole.NamaRole} berhasil ditambahkan. Mohon tunggu untuk verifikasi Role oleh Admin.`,
+                })
             }
-            setRoles(roles.filter((r) => r.roleId !== localRole.roleId))
+        }
+    }
+
+    const handleRemoveRole = async (localRole: RoleTypeProps) => {
+        const res = await fetch(
+            "/api/protected/role/removeRoleFromMember?roleId=" +
+                localRole.RoleId
+        )
+        if (res.status === 200) {
+            if (role) {
+                const index = role.findIndex(
+                    (x) => x.RoleId === localRole.RoleId
+                )
+                setZustandValue(roleStore, removeItemAtIndex(role, index))
+                localStorage.setItem(
+                    "kpb.my-role",
+                    JSON.stringify(removeItemAtIndex(role, index))
+                )
+                setRole(removeItemAtIndex(role, index))
+                setRoles([...roles, localRole])
+                setSelectedRole(null)
+                setSelectedLayanan(null)
+                toast({
+                    variant: "default",
+                    title: "Peran berhasil dihapus",
+                    description: `Peran ${localRole.NamaRole} berhasil dihapus.`,
+                })
+            }
         }
     }
 
@@ -159,6 +197,7 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                     {role ? (
                         <ResponsiveServiceSelector
                             roles={role}
+                            handleRemoveRole={handleRemoveRole}
                             selectedRole={selectedRole}
                             setSelectedRole={setSelectedRole}
                             selectedLayanan={selectedLayanan}

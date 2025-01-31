@@ -22,7 +22,7 @@ import {
     FormMessage,
 } from "../ui/form"
 import { signIn, useSession } from "next-auth/react"
-import { useSearchParams, useRouter } from "next/navigation"
+import { useSearchParams } from "next/navigation"
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { LogInIcon } from "lucide-react"
 import { authStore } from "@/store/AuthStore"
@@ -37,7 +37,6 @@ export function LoginForm({
     className,
     ...props
 }: React.ComponentPropsWithoutRef<"div">) {
-    const router = useRouter()
     const { data: session } = useSession()
     const searchParam = useSearchParams()
     const [errorMessage, setErrorMessage] = React.useState<string | null>(null)
@@ -65,27 +64,36 @@ export function LoginForm({
         }
 
         if (result?.ok) {
-            const user = await fetch("/api/protected/profile").then((res) =>
-                res.json()
-            )
-            const role = await fetch("/api/protected/role").then((res) =>
-                res.json()
-            )
-            setZustandValue<AuthTypesProps | null>(authStore, {
-                id: user.data.userloginId,
-                username: user.data.username,
-                nama: user.data.member.Ktp.nama,
-                avatar: user.data.member.avatar,
-                email: user.data.member.email,
+            await fetch("/api/protected/profile").then(async (res) => {
+                const user = await res.json()
+                await localStorage.setItem(
+                    "kpb.my-profile",
+                    JSON.stringify(user.data[0])
+                )
+                await setZustandValue<AuthTypesProps | null>(authStore, {
+                    id: user.data[0].userloginId,
+                    username: user.data[0].username,
+                    nama: user.data[0].member.Ktp.nama,
+                    avatar: user.data[0].member.avatar,
+                    email: user.data[0].member.email,
+                })
+                await setZustandValue<ProfileTypeProps | null>(profileStore, {
+                    ktp: user.data[0].member.Ktp,
+                    member: user.data[0].member,
+                    userlogin: user.data[0],
+                })
             })
-            setZustandValue<ProfileTypeProps | null>(profileStore, {
-                ktp: user.data.member.Ktp,
-                member: user.data.member,
-                userlogin: user.data,
+            await fetch("/api/protected/role").then(async (res) => {
+                const role = await res.json()
+                await localStorage.setItem(
+                    "kpb.my-role",
+                    JSON.stringify(role.data)
+                )
+                await setZustandValue<RoleTypeProps[] | null>(
+                    roleStore,
+                    role.data
+                )
             })
-            setZustandValue<RoleTypeProps[] | null>(roleStore, role.data)
-            localStorage.setItem("kpb.my-profile", JSON.stringify(user.data))
-            localStorage.setItem("kpb.my-role", JSON.stringify(role.data))
             setErrorMessage(null)
             // router.push(searchParam.get("callbackUrl") || "/");
             window.location.href = searchParam.get("callbackUrl") || "/"

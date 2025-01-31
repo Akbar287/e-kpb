@@ -1,59 +1,106 @@
-import { PrismaClient } from "@prisma/client"
+import {
+    ChildLayanan,
+    Layanan,
+    Role,
+    RoleLayanan,
+    SubLayanan,
+} from "@/db/schema"
+import { asc, eq, sql } from "drizzle-orm"
+import { drizzle } from "drizzle-orm/node-postgres"
 import { NextRequest, NextResponse } from "next/server"
 
-const prisma = new PrismaClient()
-
 export async function GET(req: NextRequest) {
-
+    const db = drizzle(process.env.DATABASE_URL!)
     try {
-        let roles = await prisma.role.findMany({
-            where: {
-                aktif: true
-            },
-            include: {
-                layanan: {
-                    include: {
-                        layanan: {
-                            include: {
-                                SubLayanan: {
-                                    include: {
-                                        childLayanan: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-            },
-        })
+        const roles = await db
+            .select()
+            .from(Role)
+            .leftJoin(RoleLayanan, eq(Role.RoleId, RoleLayanan.RoleId))
+            .leftJoin(Layanan, eq(RoleLayanan.LayananId, Layanan.LayananId))
+            .leftJoin(SubLayanan, eq(Layanan.LayananId, SubLayanan.LayananId))
+            .leftJoin(
+                ChildLayanan,
+                eq(SubLayanan.SubLayananId, ChildLayanan.SubLayananId)
+            )
+            .where(eq(Role.Aktif, true))
+            .orderBy(asc(Role.NamaRole))
 
-        if (roles) {
-            roles = roles.map(
-                (rm) => {
-                    return {
-                        roleId: rm.roleId,
-                        namaRole: rm.namaRole,
-                        keterangan: rm.keterangan,
-                        aktif: rm.aktif,
-                        statusRole: rm.statusRole,
-                        layanan: rm.layanan.map((layanan) => ({
-                            roleId: rm.roleId,
-                            layananId: layanan.layananId,
-                            layanan: {
-                                layananId: layanan.layanan.layananId,
-                                namaLayanan: layanan.layanan.namaLayanan,
-                                keterangan: layanan.layanan.keterangan,
-                                icon: layanan.layanan.icon,
-                                url: layanan.layanan.url,
-                                SubLayanan: layanan.layanan.SubLayanan,
+        const nestedRoles = roles.reduce(
+            (acc, row) => {
+                // Find or create role
+                let roleEntry = acc.find((r) => r.RoleId === row.role.RoleId)
+                if (!roleEntry) {
+                    roleEntry = {
+                        ...row.role,
+                        Layanan: [],
+                    }
+                    acc.push(roleEntry)
+                }
+
+                // Handle Layanan
+                if (row.layanan) {
+                    let layananEntry = roleEntry.Layanan.find(
+                        (l) => l.LayananId === row.role_layanan?.LayananId
+                    )
+                    if (!layananEntry) {
+                        layananEntry = {
+                            ...row.layanan,
+                            SubLayanan: [],
+                        }
+                        roleEntry.Layanan.push(layananEntry)
+                    }
+
+                    // Handle SubLayanan
+                    if (row.sub_layanan) {
+                        let subLayananEntry = layananEntry.SubLayanan.find(
+                            (s) =>
+                                s.SubLayananId === row.sub_layanan?.SubLayananId
+                        )
+                        if (!subLayananEntry) {
+                            subLayananEntry = {
+                                ...row.sub_layanan,
+                                ChildLayanan: [],
                             }
-                        })),
+                            layananEntry.SubLayanan.push(subLayananEntry)
+                        }
+
+                        // Handle ChildLayanan
+                        if (row.child_layanan) {
+                            const childExists =
+                                subLayananEntry.ChildLayanan.some(
+                                    (c) =>
+                                        c.ChildLayananId ===
+                                        row.child_layanan?.ChildLayananId
+                                )
+                            if (!childExists) {
+                                subLayananEntry.ChildLayanan.push(
+                                    row.child_layanan
+                                )
+                            }
+                        }
                     }
                 }
-            )
-        }
 
-        if (!roles) {
+                return acc
+            },
+            [] as Array<
+                typeof Role.$inferSelect & {
+                    Layanan: Array<
+                        typeof Layanan.$inferSelect & {
+                            SubLayanan: Array<
+                                typeof SubLayanan.$inferSelect & {
+                                    ChildLayanan: Array<
+                                        typeof ChildLayanan.$inferSelect
+                                    >
+                                }
+                            >
+                        }
+                    >
+                }
+            >
+        )
+
+        if (roles.length === 0) {
             return NextResponse.json(
                 {
                     data: [],
@@ -67,7 +114,7 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(
             {
                 message: "Data berhasil ditemukan",
-                data: roles,
+                data: nestedRoles,
                 status: "found",
             },
             { status: 200 }
