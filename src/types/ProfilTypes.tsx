@@ -3,7 +3,7 @@ enum JenisKelamin {
     WANITA,
 }
 
-export interface KtpModelProps {
+export interface KtpTypeProps {
     ktpId: string
     nik: string
     nama: string
@@ -17,7 +17,7 @@ export interface KtpModelProps {
     pekerjaan: string
 }
 
-export const KtpModelValue: KtpModelProps = {
+export const KtpTypeValue: KtpTypeProps = {
     ktpId: "",
     nik: "",
     nama: "",
@@ -31,7 +31,7 @@ export const KtpModelValue: KtpModelProps = {
     pekerjaan: "",
 }
 
-export interface MemberModelProps {
+export interface MemberTypeProps {
     memberId: string
     ktpId: string
     statusMemberId: string
@@ -44,7 +44,7 @@ export interface MemberModelProps {
     deletedAt: string | null
 }
 
-export const MemberModelValue: MemberModelProps = {
+export const MemberTypeValue: MemberTypeProps = {
     memberId: "",
     ktpId: "",
     statusMemberId: "",
@@ -57,7 +57,7 @@ export const MemberModelValue: MemberModelProps = {
     deletedAt: "",
 }
 
-export interface UserloginModelProps {
+export interface UserloginTypeProps {
     userloginId: string
     memberId: string
     provider: string
@@ -66,7 +66,7 @@ export interface UserloginModelProps {
     password: string | null
 }
 
-export const UserloginModelValue: UserloginModelProps = {
+export const UserloginTypeValue: UserloginTypeProps = {
     userloginId: "",
     memberId: "",
     provider: "",
@@ -75,14 +75,14 @@ export const UserloginModelValue: UserloginModelProps = {
     password: "",
 }
 
-export interface ProfileModelProps {
-    ktp: KtpModelProps
-    member: MemberModelProps
-    userlogin: UserloginModelProps
+export interface ProfileTypeProps {
+    ktp: KtpTypeProps
+    member: MemberTypeProps
+    userlogin: UserloginTypeProps
 }
 
-export const ProfileModelValue: ProfileModelProps = {
-    ktp: KtpModelValue,
-    member: MemberModelValue,
-    userlogin: UserloginModelValue,
+export const ProfileTypeValue: ProfileTypeProps = {
+    ktp: KtpTypeValue,
+    member: MemberTypeValue,
+    userlogin: UserloginTypeValue,
 }

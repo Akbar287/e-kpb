@@ -1,9 +1,10 @@
-import { LayananModelProps } from "@/models/RoleModel"
+import { LayananTypeProps } from "@/types/RoleTypes"
 import { createZustandStore } from "nes-zustand"
 
 // Create a store
-export const selectedLayananStore =
-    createZustandStore<LayananModelProps | null>({
+export const selectedLayananStore = createZustandStore<LayananTypeProps | null>(
+    {
         key: "selectedLayananStore",
         default: null,
-    })
+    }
+)

@@ -3,17 +3,17 @@ export enum StatusRole {
     PRIVATE,
 }
 
-export interface RoleModelProps {
+export interface RoleTypeProps {
     roleId: string
     namaRole: string
     keterangan: string
     aktif: boolean
     confirm: boolean
     statusRole: StatusRole
-    layanan: LayananModelProps[]
+    layanan: LayananTypeProps[]
 }
 
-export const RoleModelValue: RoleModelProps = {
+export const RoleTypeValue: RoleTypeProps = {
     roleId: "",
     namaRole: "",
     keterangan: "",
@@ -23,16 +23,16 @@ export const RoleModelValue: RoleModelProps = {
     layanan: [],
 }
 
-export interface LayananModelProps {
+export interface LayananTypeProps {
     layananId: string
     namaLayanan: string
     keterangan: string
     icon: string
     url: string
-    SubLayanan: SubLayananModelProps[]
+    SubLayanan: SubLayananTypeProps[]
 }
 
-export const LayananModelValue: LayananModelProps = {
+export const LayananTypeValue: LayananTypeProps = {
     layananId: "",
     namaLayanan: "",
     keterangan: "",
@@ -41,16 +41,16 @@ export const LayananModelValue: LayananModelProps = {
     SubLayanan: [],
 }
 
-export interface SubLayananModelProps {
+export interface SubLayananTypeProps {
     subLayananId: string
     namaSubLayanan: string
     keterangan: string
     icon: string
     url: string
-    childLayanan: ChildLayananModelProps[]
+    childLayanan: ChildLayananTypeProps[]
 }
 
-export const SubLayananModelValue: SubLayananModelProps = {
+export const SubLayananTypeValue: SubLayananTypeProps = {
     subLayananId: "",
     namaSubLayanan: "",
     keterangan: "",
@@ -59,7 +59,7 @@ export const SubLayananModelValue: SubLayananModelProps = {
     childLayanan: [],
 }
 
-export interface ChildLayananModelProps {
+export interface ChildLayananTypeProps {
     childLayananId: string
     namaChildLayanan: string
     keterangan: string
@@ -67,7 +67,7 @@ export interface ChildLayananModelProps {
     url: string
 }
 
-export const ChildLayananModelValue: ChildLayananModelProps = {
+export const ChildLayananTypeValue: ChildLayananTypeProps = {
     childLayananId: "",
     namaChildLayanan: "",
     keterangan: "",

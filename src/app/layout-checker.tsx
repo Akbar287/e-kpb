@@ -7,7 +7,6 @@ import { signOut, useSession } from "next-auth/react"
 import { ResponsiveServiceSelector } from "@/components/change-role-service"
 import { getZustandValue, setZustandValue } from "nes-zustand"
 import { roleStore } from "@/store/RoleStore"
-import { LayananModelProps, RoleModelProps } from "@/models/RoleModel"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { LogOut } from "lucide-react"
@@ -15,23 +14,24 @@ import { selectedRoleStore } from "@/store/SelectedRoleStore"
 import { selectedLayananStore } from "@/store/SelectedServiceStore"
 import { LoadingScreen } from "@/components/loading-screen"
 import { RoleManagerDrawer } from "@/components/role-manage-drawer"
+import { LayananTypeProps, RoleTypeProps } from "@/types/RoleTypes"
 
 const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
     const router = useRouter()
     const { data: session, status } = useSession()
     const [app, setApp] = React.useState(false)
-    const [role, setRole] = React.useState<RoleModelProps[] | null>(() => {
+    const [role, setRole] = React.useState<RoleTypeProps[] | null>(() => {
         if (typeof window !== "undefined") {
             return getZustandValue(roleStore)
         }
         return null
     })
-    const [roles, setRoles] = React.useState<RoleModelProps[]>([])
+    const [roles, setRoles] = React.useState<RoleTypeProps[]>([])
     const [loading, setLoading] = React.useState(false)
     const [selectedRole, setSelectedRole] =
-        React.useState<RoleModelProps | null>(null)
+        React.useState<RoleTypeProps | null>(null)
     const [selectedLayanan, setSelectedLayanan] =
-        React.useState<LayananModelProps | null>(null)
+        React.useState<LayananTypeProps | null>(null)
 
     const gotoApp = () => {
         if (selectedRole && selectedLayanan) {
@@ -87,7 +87,7 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
         setLoading(false)
     }
 
-    const handleAddRole = async (localRole: RoleModelProps) => {
+    const handleAddRole = async (localRole: RoleTypeProps) => {
         const res = await fetch(
             "/api/protected/role/addRoleToMember?roleId=" + localRole.roleId
         )
@@ -122,7 +122,7 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
         ) : loading ? (
             <LoadingScreen />
         ) : (
-            <div className="p-8 bg-gradient-to-br from-gray-100 to-gray-50 dark:from-gray-800 dark:to-gray-700 ">
+            <div className="p-8 min-h-screen bg-gradient-to-br from-green-100 via-yellow-100 to-red-100 dark:from-gray-800 dark:to-gray-700 ">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex ml-4 mb-8">
                         <h1 className="text-3xl font-bold text-primary flex">

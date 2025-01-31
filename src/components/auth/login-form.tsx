@@ -27,11 +27,11 @@ import { Alert, AlertDescription, AlertTitle } from "../ui/alert"
 import { LogInIcon } from "lucide-react"
 import { authStore } from "@/store/AuthStore"
 import { setZustandValue } from "nes-zustand"
-import { AuthModelProps } from "@/models/AuthModel"
-import { ProfileModelProps } from "@/models/ProfilModel"
 import { profileStore } from "@/store/ProfileStore"
-import { RoleModelProps } from "@/models/RoleModel"
 import { roleStore } from "@/store/RoleStore"
+import { AuthTypesProps } from "@/types/AuthTypes"
+import { ProfileTypeProps } from "@/types/ProfilTypes"
+import { RoleTypeProps } from "@/types/RoleTypes"
 
 export function LoginForm({
     className,
@@ -71,19 +71,19 @@ export function LoginForm({
             const role = await fetch("/api/protected/role").then((res) =>
                 res.json()
             )
-            setZustandValue<AuthModelProps | null>(authStore, {
+            setZustandValue<AuthTypesProps | null>(authStore, {
                 id: user.data.userloginId,
                 username: user.data.username,
                 nama: user.data.member.Ktp.nama,
                 avatar: user.data.member.avatar,
                 email: user.data.member.email,
             })
-            setZustandValue<ProfileModelProps | null>(profileStore, {
+            setZustandValue<ProfileTypeProps | null>(profileStore, {
                 ktp: user.data.member.Ktp,
                 member: user.data.member,
                 userlogin: user.data,
             })
-            setZustandValue<RoleModelProps[] | null>(roleStore, role.data)
+            setZustandValue<RoleTypeProps[] | null>(roleStore, role.data)
             localStorage.setItem("kpb.my-profile", JSON.stringify(user.data))
             localStorage.setItem("kpb.my-role", JSON.stringify(role.data))
             setErrorMessage(null)

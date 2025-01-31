@@ -29,7 +29,6 @@ import {
 import { useTheme } from "next-themes"
 import { useRouter } from "next/navigation"
 import React from "react"
-import { signOut } from "next-auth/react"
 
 export function NavUser({
     user,

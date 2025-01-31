@@ -6,7 +6,7 @@ import { Loader2 } from "lucide-react"
 
 export function LoadingScreen() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 dark:from-gray-300 dark:to-gray-100 flex items-center justify-center p-4">
             <motion.div
                 initial={{ opacity: 0, scale: 0.5 }}
                 animate={{ opacity: 1, scale: 1 }}

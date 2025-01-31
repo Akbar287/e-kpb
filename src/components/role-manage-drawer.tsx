@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/drawer"
 import { Input } from "@/components/ui/input"
 import { Search, X, UserPenIcon, LogInIcon } from "lucide-react"
-import { RoleModelProps } from "@/models/RoleModel"
+import { RoleTypeProps } from "@/types/RoleTypes"
 
 export function RoleManagerDrawer({
     roles,
@@ -20,16 +20,14 @@ export function RoleManagerDrawer({
     handleAddRole,
     myRoles,
 }: {
-    roles: RoleModelProps[]
-    setRoles: (roles: RoleModelProps[]) => void
-    handleAddRole: (role: RoleModelProps) => void
-    myRoles: RoleModelProps[] | null
+    roles: RoleTypeProps[]
+    setRoles: (roles: RoleTypeProps[]) => void
+    handleAddRole: (role: RoleTypeProps) => void
+    myRoles: RoleTypeProps[] | null
 }) {
     const [loading, setLoading] = useState<boolean>(false)
     const [searchQuery, setSearchQuery] = useState<string>("")
-    const [selectedRole, setSelectedRole] = useState<RoleModelProps | null>(
-        null
-    )
+    const [selectedRole, setSelectedRole] = useState<RoleTypeProps | null>(null)
 
     React.useEffect(() => {
         const getRoles = async () => {
@@ -41,7 +39,7 @@ export function RoleManagerDrawer({
                 setRoles(
                     myRoles
                         ? data.data.filter(
-                              (role: RoleModelProps) =>
+                              (role: RoleTypeProps) =>
                                   !myRoles.some(
                                       (myRole) => myRole.roleId === role.roleId
                                   )
@@ -93,23 +91,23 @@ export function RoleManagerDrawer({
                             stiffness: 100,
                             damping: 20,
                         }}
-                        className="bg-gradient-to-br from-indigo-900 to-purple-900 h-full text-white flex flex-col"
+                        className="bg-gradient-to-br from-green-300/80 to-yellow-300/50 via-red-300/30 dark:from-gray-800 dark:to-gray-700 h-full text-gray-800/80 dark:text-white flex flex-col"
                     >
-                        <div className="bg-gradient-to-br from-indigo-900 to-purple-900 h-full text-white flex-1 flex flex-col">
-                            <div className="max-w-7xl mx-auto p-6">
+                        <div className="bg-gradient-to-br from-green-300/80 to-yellow-300/50 via-red-300/30 dark:from-gray-800 dark:to-gray-700 h-full text-gray-800/80 dark:text-white flex-1 flex flex-col">
+                            <div className="w-full lg:max-w-7xl mx-auto p-6">
                                 <DrawerHeader className="border-b border-white/20 pb-6">
                                     <div className="flex justify-between items-center">
                                         <DrawerTitle className="text-3xl font-bold">
-                                            Pengaturan Peran Anda
+                                            Atur Peran Anda
                                         </DrawerTitle>
                                         <DrawerTrigger>
-                                            <X className="h-6 w-6 text-white/70 hover:text-white transition-colors" />
+                                            <X className="h-6 w-6 text-gray-500 dark:text-white/70 hover:text-white transition-colors" />
                                         </DrawerTrigger>
                                     </div>
 
                                     <div className="mt-6 flex gap-4">
                                         <div className="relative flex-1 flex items-center justify-center">
-                                            <Search className="absolute left-2 top-2 h-5 w-5 text-white/50" />
+                                            <Search className="absolute left-2 top-2 h-5 w-5 text-gray-500 dark:text-white/50" />
                                             <Input
                                                 placeholder="Cari Peran..."
                                                 value={searchQuery}
@@ -118,7 +116,7 @@ export function RoleManagerDrawer({
                                                         e.target.value
                                                     )
                                                 }}
-                                                className="pl-10 bg-white/5 border-white/20 text-white placeholder:text-white/50"
+                                                className="pl-10 transition-all active:shadow-md hover:shadow-lg bg-transparent border-gray-800/20 dark:bg-white/5 dark:border-white/20 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/50"
                                             />
                                         </div>
                                     </div>
@@ -126,7 +124,7 @@ export function RoleManagerDrawer({
 
                                 <LayoutGroup>
                                     <motion.div
-                                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 p-4 flex-1 overflow-y-auto"
+                                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 p-4 flex-1 h-[calc(100vh-200px)] overflow-y-auto"
                                         layout
                                     >
                                         <AnimatePresence mode="popLayout">
@@ -147,7 +145,7 @@ export function RoleManagerDrawer({
                                                         className={`p-6 rounded-xl cursor-pointer transition-all${
                                                             selectedRole ===
                                                             role
-                                                                ? "bg-white/20 border-2 border-indigo-400"
+                                                                ? "bg-white/20 border-2 border-green-700 dark:border-green-200"
                                                                 : "bg-white/10 hover:bg-white/15 border-2 border-transparent"
                                                         }`}
                                                         onClick={() =>
@@ -192,7 +190,7 @@ export function RoleManagerDrawer({
                                                                                 role
                                                                             )
                                                                         }}
-                                                                        className="text-xs"
+                                                                        className="text-xs transition-all  bg-gradient-to-r from-green-200 to-yellow-100 via-red-100 text-gray-700 hover:scale-105"
                                                                     >
                                                                         <LogInIcon className="mr-2 h-3 w-3" />
                                                                         Ajukan
@@ -201,16 +199,11 @@ export function RoleManagerDrawer({
                                                             )}
                                                         </AnimatePresence>
                                                     </div>
-
-                                                    {/* Hover effect */}
-                                                    <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-indigo-500/30 to-purple-500/30 opacity-0 group-hover:opacity-100 transition-opacity -z-10" />
                                                 </motion.div>
                                             ))}
                                         </AnimatePresence>
                                     </motion.div>
                                 </LayoutGroup>
-
-                                {/* Empty State */}
                                 {loading ? (
                                     <></>
                                 ) : (

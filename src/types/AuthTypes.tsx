@@ -1,4 +1,4 @@
-export interface AuthModelProps {
+export interface AuthTypesProps {
     id: string
     username: string
     nama: string
@@ -6,7 +6,7 @@ export interface AuthModelProps {
     email: string
 }
 
-export const AuthModelValue: AuthModelProps = {
+export const AuthTypesValue: AuthTypesProps = {
     id: "",
     username: "",
     nama: "",
