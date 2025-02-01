@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { InfoIcon, SearchIcon, Trash2Icon } from "lucide-react"
 import { LayananTypeProps, RoleTypeProps } from "@/types/RoleTypes"
+import { motion } from "framer-motion"
 
 export function ResponsiveServiceSelector({
     roles,
@@ -22,6 +23,9 @@ export function ResponsiveServiceSelector({
     selectedLayanan,
     setSelectedLayanan,
     gotoApp,
+    loadingAddRemoveRole,
+    setLoadingAddRemoveRole,
+    loadingLogout,
 }: {
     roles: RoleTypeProps[]
     handleRemoveRole: (role: RoleTypeProps) => void
@@ -31,7 +35,10 @@ export function ResponsiveServiceSelector({
     setSelectedLayanan: React.Dispatch<
         React.SetStateAction<LayananTypeProps | null>
     >
+    loadingLogout: boolean
     gotoApp: () => void
+    loadingAddRemoveRole: boolean
+    setLoadingAddRemoveRole: React.Dispatch<React.SetStateAction<boolean>>
 }) {
     const [searchQuery, setSearchQuery] = useState("")
 
@@ -55,6 +62,7 @@ export function ResponsiveServiceSelector({
                         const role = roles.find((r) => r.RoleId === value)
                         setSelectedRole(role || null)
                     }}
+                    disabled={loadingAddRemoveRole || loadingLogout}
                 >
                     <SelectTrigger className="flex-1">
                         <SelectValue placeholder="Pilih Peran" />
@@ -92,7 +100,9 @@ export function ResponsiveServiceSelector({
                                                 : "ghost"
                                         }
                                         className={`${
-                                            role.RoleId === selectedRole?.RoleId
+                                            role.RoleId ===
+                                                selectedRole?.RoleId &&
+                                            !loadingAddRemoveRole
                                                 ? "border-primary bg-primary/5 ring-1 ring-primary scale-105 translate-x-2 shadow-md"
                                                 : "border-gray-200 dark:border-gray-600 border-[1px] border-foreground "
                                         } mb-3 w-full flex justify-between hover:bg-gradient-to-r dark:bg-gray-700/50 dark:hover:bg-gray-300 dark:hover:text-gray-800 hover:from-green-200/50 transition-all hover:to-yellow-200/50 hover:via-red-200/40`}
@@ -100,6 +110,10 @@ export function ResponsiveServiceSelector({
                                             setSelectedRole(role)
                                             setSelectedLayanan(null)
                                         }}
+                                        disabled={
+                                            loadingAddRemoveRole ||
+                                            loadingLogout
+                                        }
                                     >
                                         {role.NamaRole}
                                         {!role.Confirm && (
@@ -124,6 +138,9 @@ export function ResponsiveServiceSelector({
                                     onChange={(e) =>
                                         setSearchQuery(e.target.value)
                                     }
+                                    disabled={
+                                        loadingAddRemoveRole || loadingLogout
+                                    }
                                     className="pl-10 border-gray-800/50 dark:border-gray-300 hover:shadow-lg transition-all active:shadow-sm"
                                 />
                                 <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-gray-800 dark:text-gray-300" />
@@ -143,18 +160,36 @@ export function ResponsiveServiceSelector({
                                         handleRemoveRole(selectedRole)
                                     }
                                     className=""
+                                    disabled={
+                                        loadingAddRemoveRole || loadingLogout
+                                    }
                                 >
                                     <span className="md:block hidden">
-                                        Hapus Peran
+                                        {loadingAddRemoveRole
+                                            ? "Menghapus..."
+                                            : "Hapus Peran"}
                                     </span>
                                     <Trash2Icon />
                                 </Button>
                             )}
                         </div>
-                        {!selectedRole ? (
+                        {loadingLogout ? (
+                            <div className="flex justify-center items-center">
+                                <h3 className="font-semibold text-lg text-center text-muted-foreground p-4">
+                                    Sedang Mengeluarkan Anda...
+                                </h3>
+                            </div>
+                        ) : !selectedRole ? (
                             <h3 className="font-semibold text-lg text-center text-muted-foreground p-4">
                                 Silakan pilih Peran
                             </h3>
+                        ) : loadingAddRemoveRole ? (
+                            <div className="flex justify-center items-center">
+                                <h3 className="font-semibold text-lg text-center text-muted-foreground p-4">
+                                    Sedang Menghapus Peran{" "}
+                                    {selectedRole?.NamaRole}
+                                </h3>
+                            </div>
                         ) : !selectedRole.Confirm ? (
                             <div className="flex justify-center items-center">
                                 <h3 className="font-semibold text-lg text-center text-muted-foreground p-4">
@@ -171,48 +206,57 @@ export function ResponsiveServiceSelector({
                             </div>
                         ) : (
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 p-4 ">
-                                {filteredLayanan.map((layanan) => (
-                                    <Card
+                                {filteredLayanan.map((layanan, index) => (
+                                    <motion.div
                                         key={layanan.LayananId}
-                                        className={`cursor-pointer transition-all hover:scale-110 hover:border-primary ${
-                                            selectedLayanan?.LayananId ===
-                                            layanan.LayananId
-                                                ? "border-primary bg-primary/5 ring-1 scale-105 ring-primary"
-                                                : "border-gray-500/50 bg-transparent"
-                                        }`}
-                                        onClick={() =>
-                                            setSelectedLayanan(layanan)
-                                        }
+                                        initial={{ opacity: 0, y: 30 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ duration: 0.5 }}
+                                        viewport={{ once: true }}
                                     >
-                                        <CardHeader className="pb-3">
-                                            <div className="flex items-center gap-3">
-                                                <div className="p-2 bg-primary/10 rounded-lg">
-                                                    <div
-                                                        style={{
-                                                            width: 24,
-                                                            height: 24,
-                                                            overflow: "hidden",
-                                                        }}
-                                                    >
-                                                        <span
-                                                            className="w-6 h-6 text-primary"
-                                                            dangerouslySetInnerHTML={{
-                                                                __html: layanan.Icon,
+                                        <Card
+                                            key={layanan.LayananId}
+                                            className={`cursor-pointer transition-all hover:scale-110 hover:border-primary ${
+                                                selectedLayanan?.LayananId ===
+                                                layanan.LayananId
+                                                    ? "border-primary bg-primary/5 ring-1 scale-105 ring-primary"
+                                                    : "border-gray-500/50 bg-transparent"
+                                            }`}
+                                            onClick={() =>
+                                                setSelectedLayanan(layanan)
+                                            }
+                                        >
+                                            <CardHeader className="pb-3">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="p-2 bg-primary/10 rounded-lg">
+                                                        <div
+                                                            style={{
+                                                                width: 24,
+                                                                height: 24,
+                                                                overflow:
+                                                                    "hidden",
                                                             }}
-                                                        />
+                                                        >
+                                                            <span
+                                                                className="w-6 h-6 text-primary"
+                                                                dangerouslySetInnerHTML={{
+                                                                    __html: layanan.Icon,
+                                                                }}
+                                                            />
+                                                        </div>
                                                     </div>
+                                                    <CardTitle className="text-lg">
+                                                        {layanan.NamaLayanan}
+                                                    </CardTitle>
                                                 </div>
-                                                <CardTitle className="text-lg">
-                                                    {layanan.NamaLayanan}
-                                                </CardTitle>
-                                            </div>
-                                        </CardHeader>
-                                        <CardContent>
-                                            <p className="text-sm text-muted-foreground line-clamp-3">
-                                                {layanan.Keterangan}
-                                            </p>
-                                        </CardContent>
-                                    </Card>
+                                            </CardHeader>
+                                            <CardContent>
+                                                <p className="text-sm text-muted-foreground line-clamp-3">
+                                                    {layanan.Keterangan}
+                                                </p>
+                                            </CardContent>
+                                        </Card>
+                                    </motion.div>
                                 ))}
                             </div>
                         )}

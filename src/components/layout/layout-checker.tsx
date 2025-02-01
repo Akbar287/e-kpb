@@ -31,6 +31,9 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
     })
     const [roles, setRoles] = React.useState<RoleTypeProps[]>([])
     const [loading, setLoading] = React.useState(false)
+    const [loadingLogout, setLoadingLogout] = React.useState(false)
+    const [loadingAddRemoveRole, setLoadingAddRemoveRole] =
+        React.useState(false)
     const [selectedRole, setSelectedRole] =
         React.useState<RoleTypeProps | null>(null)
     const [selectedLayanan, setSelectedLayanan] =
@@ -63,13 +66,23 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
     }
 
     const logout = async () => {
-        await signOut().then(() => {
-            localStorage.removeItem("kpb.my-role")
-            localStorage.removeItem("kpb.my-profile")
-            localStorage.removeItem("kpb.selected-role")
-            localStorage.removeItem("kpb.selected-services")
-            router.push("/")
-        })
+        setLoadingLogout(true)
+        setSelectedRole(null)
+        setSelectedLayanan(null)
+        await signOut()
+            .then(() => {
+                localStorage.removeItem("kpb.my-role")
+                localStorage.removeItem("kpb.my-profile")
+                localStorage.removeItem("kpb.selected-role")
+                localStorage.removeItem("kpb.selected-services")
+                router.push("/")
+            })
+            .catch((err) => {
+                console.error(err)
+            })
+            .finally(() => {
+                setLoadingLogout(false)
+            })
     }
 
     const checkRole = () => {
@@ -91,6 +104,7 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
     }
 
     const handleAddRole = async (localRole: RoleTypeProps) => {
+        setLoadingAddRemoveRole(true)
         const res = await fetch(
             "/api/protected/role/addRoleToMember?roleId=" + localRole.RoleId
         )
@@ -103,7 +117,6 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                     JSON.stringify([...role, localRole])
                 )
                 setRoles(roles.filter((r) => r.RoleId !== localRole.RoleId))
-
                 toast({
                     variant: "default",
                     title: "Peran berhasil ditambahkan",
@@ -111,9 +124,11 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                 })
             }
         }
+        setLoadingAddRemoveRole(false)
     }
 
     const handleRemoveRole = async (localRole: RoleTypeProps) => {
+        setLoadingAddRemoveRole(true)
         const res = await fetch(
             "/api/protected/role/removeRoleFromMember?roleId=" +
                 localRole.RoleId
@@ -139,6 +154,7 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                 })
             }
         }
+        setLoadingAddRemoveRole(false)
     }
 
     React.useEffect(() => {
@@ -183,13 +199,21 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                                 setRoles={setRoles}
                                 handleAddRole={handleAddRole}
                                 myRoles={role}
+                                loadingAddRemoveRole={loadingAddRemoveRole}
+                                setLoadingAddRemoveRole={
+                                    setLoadingAddRemoveRole
+                                }
+                                loadingLogout={loadingLogout}
                             />
                             <Button
                                 className="bg-transparent text-red-800 dark:text-red-100 hover:bg-red-200 dark:hover:bg-red-800 border-2 border-red-800 dark:border-red-100"
                                 type="button"
+                                disabled={loadingAddRemoveRole || loadingLogout}
                                 onClick={() => logout()}
                             >
-                                <span className="md:block hidden">Keluar</span>
+                                <span className="md:block hidden">
+                                    {loadingLogout ? "Logout..." : "Logout"}
+                                </span>
                                 <LogOut size={24} />
                             </Button>
                         </div>
@@ -203,6 +227,9 @@ const LayoutChecker = ({ children }: { children: React.ReactNode }) => {
                             selectedLayanan={selectedLayanan}
                             setSelectedLayanan={setSelectedLayanan}
                             gotoApp={gotoApp}
+                            loadingAddRemoveRole={loadingAddRemoveRole}
+                            setLoadingAddRemoveRole={setLoadingAddRemoveRole}
+                            loadingLogout={loadingLogout}
                         />
                     ) : (
                         <LoadingScreen />

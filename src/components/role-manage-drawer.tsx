@@ -19,39 +19,45 @@ export function RoleManagerDrawer({
     setRoles,
     handleAddRole,
     myRoles,
+    loadingAddRemoveRole,
+    setLoadingAddRemoveRole,
+    loadingLogout,
 }: {
     roles: RoleTypeProps[]
     setRoles: (roles: RoleTypeProps[]) => void
     handleAddRole: (role: RoleTypeProps) => void
     myRoles: RoleTypeProps[] | null
+    loadingAddRemoveRole: boolean
+    setLoadingAddRemoveRole: React.Dispatch<React.SetStateAction<boolean>>
+    loadingLogout: boolean
 }) {
     const [loading, setLoading] = useState<boolean>(false)
     const [searchQuery, setSearchQuery] = useState<string>("")
     const [selectedRole, setSelectedRole] = useState<RoleTypeProps | null>(null)
 
-    React.useEffect(() => {
-        const getRoles = async () => {
-            if (roles.length > 0) return
-            setLoading(true)
-            try {
-                const res = await fetch("/api/protected/role/all")
-                const data = await res.json()
-                setRoles(
-                    myRoles
-                        ? data.data.filter(
-                              (role: RoleTypeProps) =>
-                                  !myRoles.some(
-                                      (myRole) => myRole.RoleId === role.RoleId
-                                  )
-                          )
-                        : data.data
-                )
-            } catch (error) {
-                console.error(error)
-            } finally {
-                setLoading(false)
-            }
+    const getRoles = async () => {
+        if (roles.length > 0) return
+        setLoading(true)
+        try {
+            const res = await fetch("/api/protected/role/all")
+            const data = await res.json()
+            setRoles(
+                myRoles
+                    ? data.data.filter(
+                          (role: RoleTypeProps) =>
+                              !myRoles.some(
+                                  (myRole) => myRole.RoleId === role.RoleId
+                              )
+                      )
+                    : data.data
+            )
+        } catch (error) {
+            console.error(error)
+        } finally {
+            setLoading(false)
         }
+    }
+    React.useEffect(() => {
         getRoles()
     }, [])
 
@@ -72,6 +78,8 @@ export function RoleManagerDrawer({
                     <Button
                         className="bg-transparent text-blue-800 dark:text-blue-100 hover:bg-blue-200 dark:hover:bg-blue-800 border-2 border-gray-800 dark:border-gray-100"
                         type="button"
+                        disabled={loadingAddRemoveRole || loadingLogout}
+                        onClick={() => getRoles()}
                     >
                         <UserPenIcon size={24} />
                         <span className="md:block hidden">Atur Peran</span>
@@ -116,6 +124,11 @@ export function RoleManagerDrawer({
                                                         e.target.value
                                                     )
                                                 }}
+                                                disabled={
+                                                    loadingAddRemoveRole ||
+                                                    loading ||
+                                                    loadingLogout
+                                                }
                                                 className="pl-10 transition-all active:shadow-md hover:shadow-lg bg-transparent border-gray-800/20 dark:bg-white/5 dark:border-white/20 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/50"
                                             />
                                         </div>
@@ -123,86 +136,102 @@ export function RoleManagerDrawer({
                                 </DrawerHeader>
 
                                 <LayoutGroup>
-                                    <motion.div
-                                        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 p-4 flex-1 h-[calc(100vh-200px)] overflow-y-auto"
-                                        layout
-                                    >
-                                        <AnimatePresence mode="popLayout">
-                                            {filteredRoles.map((role) => (
-                                                <motion.div
-                                                    key={role.RoleId}
-                                                    layout
-                                                    initial="hidden"
-                                                    animate="visible"
-                                                    exit="exit"
-                                                    variants={cardVariants}
-                                                    transition={{
-                                                        duration: 0.3,
-                                                    }}
-                                                    className="relative group"
-                                                >
-                                                    <div
-                                                        className={`p-6 rounded-xl cursor-pointer transition-all${
-                                                            selectedRole ===
-                                                            role
-                                                                ? "bg-white/20 border-2 border-green-700 dark:border-green-200"
-                                                                : "bg-white/10 hover:bg-white/15 border-2 border-transparent"
-                                                        }`}
-                                                        onClick={() =>
-                                                            setSelectedRole(
-                                                                (prev) =>
-                                                                    prev ===
-                                                                    role
-                                                                        ? null
-                                                                        : role
-                                                            )
-                                                        }
+                                    {loading ? (
+                                        <div className="flex-1 flex items-center justify-center">
+                                            <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-600/20"></div>
+                                        </div>
+                                    ) : (
+                                        <motion.div
+                                            className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-8 p-4 flex-1 h-[calc(100vh-200px)] overflow-y-auto"
+                                            layout
+                                        >
+                                            <AnimatePresence mode="popLayout">
+                                                {filteredRoles.map((role) => (
+                                                    <motion.div
+                                                        key={role.RoleId}
+                                                        layout
+                                                        initial="hidden"
+                                                        animate="visible"
+                                                        exit="exit"
+                                                        variants={cardVariants}
+                                                        transition={{
+                                                            duration: 0.3,
+                                                        }}
+                                                        className="relative group"
                                                     >
-                                                        <h3 className="text-lg font-semibold truncate">
-                                                            {role.NamaRole}
-                                                        </h3>
+                                                        <div
+                                                            className={`p-6 rounded-xl cursor-pointer transition-all${
+                                                                selectedRole ===
+                                                                role
+                                                                    ? "bg-white/20 border-2 border-green-700 dark:border-green-200"
+                                                                    : "bg-white/10 hover:bg-white/15 border-2 border-transparent"
+                                                            }`}
+                                                            onClick={() =>
+                                                                setSelectedRole(
+                                                                    (prev) =>
+                                                                        prev ===
+                                                                        role
+                                                                            ? null
+                                                                            : role
+                                                                )
+                                                            }
+                                                        >
+                                                            <h3 className="text-lg font-semibold truncate">
+                                                                {role.NamaRole}
+                                                            </h3>
 
-                                                        <AnimatePresence>
-                                                            {selectedRole ===
-                                                                role && (
-                                                                <motion.div
-                                                                    initial={{
-                                                                        opacity: 0,
-                                                                        y: -10,
-                                                                    }}
-                                                                    animate={{
-                                                                        opacity: 1,
-                                                                        y: 0,
-                                                                    }}
-                                                                    exit={{
-                                                                        opacity: 0,
-                                                                        y: -10,
-                                                                    }}
-                                                                    className="mt-4 flex justify-end gap-2"
-                                                                >
-                                                                    <Button
-                                                                        size="sm"
-                                                                        onClick={(
-                                                                            e
-                                                                        ) => {
-                                                                            e.stopPropagation()
-                                                                            handleAddRole(
-                                                                                role
-                                                                            )
+                                                            <AnimatePresence>
+                                                                {selectedRole ===
+                                                                    role && (
+                                                                    <motion.div
+                                                                        initial={{
+                                                                            opacity: 0,
+                                                                            y: -10,
                                                                         }}
-                                                                        className="text-xs transition-all  bg-gradient-to-r from-green-200 to-yellow-100 via-red-100 text-gray-700 hover:scale-105"
+                                                                        animate={{
+                                                                            opacity: 1,
+                                                                            y: 0,
+                                                                        }}
+                                                                        exit={{
+                                                                            opacity: 0,
+                                                                            y: -10,
+                                                                        }}
+                                                                        className="mt-4 flex justify-end gap-2"
                                                                     >
-                                                                        <LogInIcon className="mr-2 h-3 w-3" />
-                                                                        Ajukan
-                                                                    </Button>
-                                                                </motion.div>
-                                                            )}
-                                                        </AnimatePresence>
-                                                    </div>
-                                                </motion.div>
-                                            ))}
-                                        </AnimatePresence>
-                                    </motion.div>
+                                                                        <Button
+                                                                            size="sm"
+                                                                            onClick={(
+                                                                                e
+                                                                            ) => {
+                                                                                e.stopPropagation()
+                                                                                handleAddRole(
+                                                                                    role
+                                                                                )
+                                                                            }}
+                                                                            disabled={
+                                                                                loadingAddRemoveRole ||
+                                                                                loadingLogout
+                                                                            }
+                                                                            className={`${
+                                                                                loadingAddRemoveRole
+                                                                                    ? "from-green-800 to-yellow-600 via-red-500 text-white"
+                                                                                    : "from-green-200 to-yellow-100 via-red-100 text-gray-700"
+                                                                            } text-xs transition-all  bg-gradient-to-r hover:scale-105`}
+                                                                        >
+                                                                            <LogInIcon className="mr-2 h-3 w-3" />
+                                                                            {loadingAddRemoveRole
+                                                                                ? "Menambah..."
+                                                                                : "Ajukan"}
+                                                                        </Button>
+                                                                    </motion.div>
+                                                                )}
+                                                            </AnimatePresence>
+                                                        </div>
+                                                    </motion.div>
+                                                ))}
+                                            </AnimatePresence>
+                                        </motion.div>
+                                    )}
                                 </LayoutGroup>
                                 {loading ? (
                                     <></>

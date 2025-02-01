@@ -6,7 +6,7 @@ import type { Metadata } from "next"
 import Providers from "./providers"
 import { getSession } from "../provider/api"
 import { Toaster } from "@/components/ui/toaster"
-import LayoutChecker from "./layout-checker"
+import LayoutChecker from "../components/layout/layout-checker"
 
 const poppins = Poppins({
     variable: "--font-poppins",
