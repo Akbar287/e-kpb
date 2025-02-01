@@ -9,18 +9,18 @@ import { Toaster } from "@/components/ui/toaster"
 import LayoutChecker from "../components/layout/layout-checker"
 
 const poppins = Poppins({
-    variable: "--font-poppins",
     subsets: ["latin"],
-    weight: ["400", "700"],
+    weight: ["400", "500", "600", "700"],
+    variable: "--font-poppins",
 })
 
 export const metadata: Metadata = {
     title: "e-KPB",
     description: "e-KPB adalah Ekosistem KPB",
     icons: {
-        icon: "/favicon.ico", // Default favicon
-        shortcut: "/shortcut-icon.png", // Shortcut icon
-        apple: "/apple-touch-icon.png", // Apple touch icon
+        icon: "/favicon.ico",
+        shortcut: "/shortcut-icon.png",
+        apple: "/apple-touch-icon.png",
     },
 }
 
@@ -33,7 +33,7 @@ export default async function RootLayout({
 
     return (
         <html lang="en" className={poppins.variable}>
-            <body>
+            <body className="font-sans">
                 <Providers session={session}>
                     <ThemeProvider
                         attribute="class"
